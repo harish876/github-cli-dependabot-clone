@@ -16,11 +16,11 @@ github update
 
 ### `main menu`
 
-<img src="../src/assets/help.png" width="650">
+<img src="./src/assets/help.png" width="650">
 
 ### `github list`
 
-<img src="../src/assets/list-pinned.png" width="550">
+<img src="./src/assets/list-pinned.png" width="550">
 
 ## How to build locally
 
