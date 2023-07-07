@@ -1,6 +1,6 @@
 # Github CLI in Node.js
 
-A Github CLI app in Node.js. The app checks weather in command line.
+A Github CLI app in Node.js. The app checks your dependencies for updates, creates a new branch and commits the latest updates and raises a PR.
 
 ## Usages
 
