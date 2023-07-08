@@ -25,7 +25,7 @@ ${greenBright("github update <options>")}
   --user ........ [Required] set the github owner name.
   --name ........ [Required] set the github repository name
   --head ........ [Required] set the headRef to which the PR has to be created
-  --file ........ [Optional] location of package.json
+  --file ........ [Optional] location of package.json. If present in folder use {folder}/package.json
 `,
 
   config: `

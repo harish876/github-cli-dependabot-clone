@@ -11,15 +11,17 @@ async function update(args) {
     name: "kick-store-next",
     head: "main",
     test: "false",
+    file: "package.json"
   };
 
   if (args) {
     input.name = args.name ? args.name : input.name;
     input.user = args.user ? args.user : input.user;
     input.head = args.head ? args.head : input.head;
+    input.file = args.file ? args.file : input.file
   }
 
-  const { user, name, head, test } = input;
+  const { user, name, head, test , file } = input;
 
   try {
     const headers = {
@@ -28,10 +30,11 @@ async function update(args) {
     };
     const query = {
       query:
-        'query ($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { id object(expression: "main:package.json") { ... on Blob { text } } }}',
+        'query ($owner: String!, $repo: String!, $exp: String!) { repository(owner: $owner, name: $repo) { id object(expression: $exp) { ... on Blob { text } } }}',
       variables: {
         owner: user,
         repo: name,
+        exp: `${head}:${file}`
       },
     };
     const { data: apiResponse } = await axios.post(
@@ -67,6 +70,7 @@ async function update(args) {
       repositoryId,
       owner: user,
       branch,
+      file
     });
 
     const pullUrl = await createPullRequest({
@@ -140,15 +144,16 @@ async function createBranch({ owner, repo, repositoryId, branch }) {
   }
 }
 
-async function createCommit({ repo, commit, owner, branch }) {
+async function createCommit({ repo, commit, owner, branch , file }) {
   const query =
-    'mutation CreateCommit($repoWithName: String!, $branch: String!, $headline:String!, $commit:Base64String!, $oid:GitObjectID!) { createCommitOnBranch( input: { branch:{ repositoryNameWithOwner: $repoWithName, branchName: $branch, } message: { headline: $headline}, fileChanges: { additions:[{ path: "package.json", contents: $commit }] }, expectedHeadOid: $oid }, ) { commit { id oid, url } }}';
+    'mutation CreateCommit($repoWithName: String!, $branch: String!, $headline:String!, $commit:Base64String!, $oid:GitObjectID!, $file:String!) { createCommitOnBranch( input: { branch:{ repositoryNameWithOwner: $repoWithName, branchName: $branch, } message: { headline: $headline}, fileChanges: { additions:[{ path: $file, contents: $commit }] }, expectedHeadOid: $oid }, ) { commit { id oid, url } }}';
   const variables = {
     repoWithName: `${owner}/${repo}`,
     branch,
     headline: "Automated PR",
     commit,
     oid: await getOid({ user: owner, name: repo, branch }),
+    file
   };
   try {
     const data = await graphqlHelper(query, variables);

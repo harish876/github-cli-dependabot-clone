@@ -22,6 +22,12 @@ github update
 
 <img src="./src/assets/list-pinned.png" width="550">
 
+### `github update`
+
+<img src="./src/assets/update.png" width="550">
+
+<img src="./src/assets/update-1.png" width="550">
+
 ## How to build locally
 
 ```sh
