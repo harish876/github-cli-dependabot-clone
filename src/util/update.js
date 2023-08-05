@@ -97,13 +97,9 @@ const packageJsonParse = (text) => {
 
 const updateObjectBuilder = async (obj, spinner, flag) => {
   let d = {};
-  let count = 0;
-  let test = flag === "true",
-    limit = 4;
   spinner.start();
   const { dependencies } = obj;
   for (let [key, value] of Object.entries(dependencies)) {
-    count++;
     await axios
       .get(`https://registry.npmjs.org/${key}`)
       .then((response) => {
@@ -115,7 +111,6 @@ const updateObjectBuilder = async (obj, spinner, flag) => {
         console.error("Error fetching package information:", error);
         spinner.error({ text: "Error!", mark: ":(" });
       });
-    if (test && count >= limit) break;
   }
   spinner.success();
   return {
@@ -259,4 +254,5 @@ function generateAwesomeBranchName() {
 
 module.exports = {
   update,
+  graphqlHelper
 };

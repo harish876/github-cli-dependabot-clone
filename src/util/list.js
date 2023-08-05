@@ -1,43 +1,38 @@
 const axios = require("axios");
 var config = require("common-config");
 const { configKey } = require("./configure");
+const { graphqlHelper } = require("./update");
 var Table = require("cli-table");
 
 async function listRepos(args) {
   const input = {
     user: "harish876",
     pinned: 6,
+    limit:5
   };
 
   if (args) {
     input.user = args.user ? args.user : input.user;
     input.pinned = args.pinned ? args.pinned : input.pinned;
+    input.limit = args.limit ? args.limit : input.limit
   }
 
   try {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.get(configKey)}`,
+    const { limit } = input;
+    const query1 =
+      "query($limit: Int!) { viewer { repositories( first: $limit affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER] orderBy: { field: CREATED_AT, direction: DESC } ) { nodes { name id description owner { login } url defaultBranchRef { name } createdAt } } }}";
+    const variables1 = {
+      limit,
     };
-    const { user , pinned } = input
-    const query = {
-      query: `{\n  user(login: "${user}") {\n pinnedItems(first: ${pinned}, types: REPOSITORY) {\n nodes {\n ... on Repository {\n name\n \n id\n \n url\n \n description\n \n defaultBranchRef { name } \n }\n }\n }\n }\n}`,
-    };
-    const { data: apiResponse } = await axios.post(
-      "https://api.github.com/graphql",
-      query,
-      {
-        headers,
-      }
-    );
-    const result = apiResponse?.data?.user?.pinnedItems?.nodes.map((edge) => {
+    const data = await graphqlHelper(query1, variables1);
+    const result = data?.viewer?.repositories?.nodes.map((edge) => {
       const node = edge;
       return {
         id: node?.id,
         name: node?.name,
         url: node?.url,
         description: node?.description,
-        defaultBranch: node?.defaultBranchRef?.name
+        defaultBranch: node?.defaultBranchRef?.name,
       };
     });
 
@@ -50,8 +45,8 @@ async function listRepos(args) {
 
 const makeTable = (result) => {
   const table = new Table({
-    head: ["Sr No", "Repo Id", "Name", "Url","Default Branch"],
-    colWidths: [5,15, 30, 40, 20],
+    head: ["Sr No", "Repo Id", "Name", "Url", "Default Branch"],
+    colWidths: [5, 10, 30, 80, 20],
     wordWrap: true,
   });
   result.map((r, i) => {

@@ -16,7 +16,7 @@ ${greenBright("github [command] <options>")}
 ${greenBright("github list <options>")}
 
   --user .......... set the github owner name.
-  --pinned ........ set the number of pinned repositories to list.
+  --limit ......... set the number of repositories to list
 `,
 
   update: `
